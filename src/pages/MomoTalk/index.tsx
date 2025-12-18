@@ -142,31 +142,33 @@ function ConversationItem({
   return (
     <button
       onClick={onClick}
-      className={`w-full p-4 flex items-center gap-3 transition-colors ${
-        isActive ? 'bg-primary/10' : 'hover:bg-gray-50'
+      className={`w-full p-4 flex items-center gap-3 transition-all duration-200 ${
+        isActive 
+          ? 'bg-gradient-to-r from-primary/15 to-primary/5 border-l-4 border-primary' 
+          : 'hover:bg-pink-50/50 border-l-4 border-transparent'
       }`}
     >
-      {/* 头像 */}
-      <div className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center overflow-hidden">
+      {/* 头像 - 圆角方形 */}
+      <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-pink-100 to-pink-50 flex items-center justify-center overflow-hidden shadow-sm border border-pink-100/50">
         {avatar ? (
           <img src={avatar} alt={name} className="w-full h-full object-cover" />
         ) : (
-          <span className="text-xl font-bold text-gray-400">{name.charAt(0)}</span>
+          <span className="text-xl font-bold text-primary/60">{name.charAt(0)}</span>
         )}
       </div>
 
       {/* 信息 */}
       <div className="flex-1 text-left min-w-0">
         <div className="flex items-center justify-between">
-          <span className="font-medium text-gray-800 truncate">{name}</span>
+          <span className="font-semibold text-gray-700 truncate">{name}</span>
           <span className="text-xs text-gray-400 flex-shrink-0">{time}</span>
         </div>
-        <p className="text-sm text-gray-500 truncate">{lastMessage}</p>
+        <p className="text-sm text-gray-500 truncate mt-0.5">{lastMessage}</p>
       </div>
 
-      {/* 未读标记 */}
+      {/* 未读标记 - 粉色 */}
       {unreadCount > 0 && (
-        <div className="w-5 h-5 rounded-full bg-red-500 text-white text-xs flex items-center justify-center">
+        <div className="w-5 h-5 rounded-full bg-gradient-to-br from-primary to-primary-dark text-white text-xs flex items-center justify-center font-medium shadow-sm">
           {unreadCount}
         </div>
       )}
@@ -254,34 +256,50 @@ function ChatArea({ student }: ChatAreaProps) {
 
   return (
     <>
-      {/* 头部 */}
-      <div className="p-4 border-b border-gray-100 flex items-center gap-3">
-        <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center overflow-hidden">
+      {/* 头部 - 增加渐变背景 */}
+      <div className="p-4 border-b border-pink-100/50 flex items-center gap-3 bg-gradient-to-r from-white to-pink-50/30">
+        <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-pink-100 to-pink-50 flex items-center justify-center overflow-hidden shadow-sm border border-pink-100/50">
           {student.avatar ? (
             <img src={student.avatar} alt={student.name} className="w-full h-full object-cover" />
           ) : (
-            <span className="text-lg font-bold text-gray-400">{student.name.charAt(0)}</span>
+            <span className="text-lg font-bold text-primary/60">{student.name.charAt(0)}</span>
           )}
         </div>
         <div>
-          <h3 className="font-semibold text-gray-800">{student.name}</h3>
-          <p className="text-xs text-green-500">在线</p>
+          <h3 className="font-semibold text-gray-700">{student.name}</h3>
+          <p className="text-xs text-emerald-500 flex items-center gap-1">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+            在线
+          </p>
         </div>
       </div>
 
       {/* 消息列表 */}
-      <div className="flex-1 overflow-auto p-4 space-y-4">
+      <div className="flex-1 overflow-auto p-4 space-y-4 bg-gradient-to-b from-white/50 to-transparent">
         {messages.map((msg) => (
           <div
             key={msg.id}
-            className={`flex ${msg.sender === 'player' ? 'justify-end' : 'justify-start'}`}
+            className={`flex items-end gap-2 ${msg.sender === 'player' ? 'justify-end' : 'justify-start'}`}
           >
+            {/* 学生头像 - 仅在学生消息时显示 */}
+            {msg.sender === 'student' && (
+              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-pink-100 to-pink-50 flex-shrink-0 overflow-hidden shadow-sm border border-pink-100/50">
+                {student.avatar ? (
+                  <img src={student.avatar} alt={student.name} className="w-full h-full object-cover" />
+                ) : (
+                  <span className="w-full h-full flex items-center justify-center text-sm font-bold text-primary/60">
+                    {student.name.charAt(0)}
+                  </span>
+                )}
+              </div>
+            )}
+            
             <div
               className={`chat-bubble ${
                 msg.sender === 'player' ? 'chat-bubble-right' : 'chat-bubble-left'
               }`}
             >
-              <p>{msg.content}</p>
+              <p className="leading-relaxed">{msg.content}</p>
               <p className={`text-xs mt-1 ${
                 msg.sender === 'player' ? 'text-white/70' : 'text-gray-400'
               }`}>
@@ -292,21 +310,21 @@ function ChatArea({ student }: ChatAreaProps) {
         ))}
       </div>
 
-      {/* 输入框 */}
-      <div className="p-4 border-t border-gray-100">
-        <div className="flex gap-2">
+      {/* 输入框 - 优化样式 */}
+      <div className="p-4 border-t border-pink-100/50 bg-white/80">
+        <div className="flex gap-3">
           <input
             type="text"
             value={message}
             onChange={(e) => setMessage(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && handleSend()}
             placeholder="输入消息..."
-            className="input flex-1"
+            className="flex-1 px-4 py-2.5 rounded-full border border-pink-200/60 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary/50 bg-pink-50/30 placeholder:text-gray-400 transition-all"
           />
           <button
             onClick={handleSend}
             disabled={!message.trim()}
-            className="btn btn-primary disabled:opacity-50"
+            className="px-5 py-2.5 rounded-full font-medium transition-all duration-200 bg-gradient-to-r from-primary to-primary-dark text-white shadow-md hover:shadow-lg hover:scale-105 disabled:opacity-50 disabled:hover:scale-100 disabled:shadow-sm"
           >
             发送
           </button>

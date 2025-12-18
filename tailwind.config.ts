@@ -8,25 +8,35 @@ export default {
   theme: {
     extend: {
       colors: {
-        // 蔚蓝档案主题色
+        // MomoTalk 粉色主题
         primary: {
-          DEFAULT: '#3b82f6',
-          light: '#60a5fa',
-          dark: '#2563eb',
+          DEFAULT: '#FF8FAB',      // 主粉色
+          light: '#FFB3C6',        // 浅粉
+          dark: '#E8729A',         // 深粉
+          darker: '#D25A85',       // 更深粉
         },
         secondary: {
-          DEFAULT: '#f0f9ff',
-          dark: '#e0f2fe',
+          DEFAULT: '#FFF5F7',      // 淡粉背景
+          dark: '#FFE4EC',         // 稍深背景
         },
         accent: {
-          DEFAULT: '#fbbf24',
-          light: '#fcd34d',
+          DEFAULT: '#FFD93D',      // 金黄点缀
+          light: '#FFE566',
         },
         ba: {
           // Blue Archive 专属色
-          blue: '#0ea5e9',
-          pink: '#f472b6',
-          yellow: '#facc15',
+          blue: '#4A9EFF',         // BA 蓝
+          pink: '#FF8FAB',         // MomoTalk 粉
+          lightPink: '#FFB6C8',    // 浅粉
+          yellow: '#FFD93D',       // 金黄
+          cream: '#FFF8F0',        // 奶油白
+        },
+        momo: {
+          // MomoTalk 专属色
+          bg: '#FFF5F7',           // 背景色
+          bubble: '#FFFFFF',       // 气泡白
+          online: '#4ADE80',       // 在线绿
+          unread: '#FF6B8A',       // 未读红粉
         },
       },
       fontFamily: {
