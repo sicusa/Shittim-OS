@@ -1,7 +1,8 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { bridge } from '../../bridge'
 import type { AnimaStudentReplyEvent } from '../../bridge/types'
-import { students, getDefaultPortrait, clubInfo } from '../../data'
+import { useRegisteredStudents } from '../../bridge/useRegisteredStudents'
+import { getDefaultPortrait, students as allStudents, clubInfo } from '../../data'
 
 // ==================== 存储相关 ====================
 
@@ -108,7 +109,7 @@ function loadConversations(): Conversation[] {
 
 // 从本地数据获取学生信息
 function _getStudentInfo(studentId: string) {
-  const student = students.find(s => s.id === studentId)
+  const student = allStudents.find(s => s.id === studentId || s.id.toLowerCase() === studentId.toLowerCase())
   return {
     name: student?.name ?? studentId,
     avatar: getDefaultPortrait(studentId),
@@ -124,28 +125,52 @@ function formatTime(date: Date): string {
   return date.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' })
 }
 
-// 创建默认对话列表
+// 创建默认对话列表（空列表，等待从后端获取）
 function createDefaultConversations(): Conversation[] {
-  // 默认显示阿罗娜
-  return [
-    {
-      studentId: 'ARONA',
-      name: '阿罗娜',
-      avatar: getDefaultPortrait('ARONA'),
-      lastMessage: '老师，有什么需要帮忙的吗？',
-      time: '刚刚',
-      unreadCount: 0,
-      messages: [],
-    }
-  ]
+  return []
 }
 
 export function MomoTalkPage() {
+  // 获取已注册学生
+  const { students: registeredStudents, loading: studentsLoading, error: studentsError } = useRegisteredStudents()
+  
   // 从 localStorage 加载对话记录
-  const [conversations, setConversations] = useState<Conversation[]>(() => loadConversations())
+  const [conversations, setConversations] = useState<Conversation[]>([])
   const [selectedId, setSelectedId] = useState<string | null>(null)
   
   const selected = conversations.find(c => c.studentId === selectedId)
+
+  // 当注册学生列表更新时，同步对话列表
+  useEffect(() => {
+    if (studentsLoading || registeredStudents.length === 0) return
+    
+    // 加载已存储的对话
+    const stored = loadConversations()
+    
+    // 合并：已注册学生 + 已存储的消息
+    const merged: Conversation[] = registeredStudents.map(student => {
+      const studentIdLower = student.animaData.id.toLowerCase()
+      // 查找已存储的对话（支持大小写匹配）
+      const existingConv = stored.find(
+        c => c.studentId.toLowerCase() === studentIdLower || 
+             c.studentId.toLowerCase() === student.id.toLowerCase()
+      )
+      
+      return {
+        studentId: student.animaData.id, // 使用后端 ID
+        name: student.name,
+        avatar: student.avatar || getDefaultPortrait(student.id),
+        lastMessage: existingConv?.lastMessage || 
+                     (student.historySize > 0 ? '点击继续对话...' : '老师，有什么需要帮忙的吗？'),
+        time: existingConv?.time || (student.hasActiveSession ? '刚刚' : '之前'),
+        unreadCount: 0,
+        messages: existingConv?.messages || [],
+      }
+    })
+    
+    setConversations(merged)
+    console.log('[MomoTalk] 已同步对话列表，共', merged.length, '个对话')
+  }, [registeredStudents, studentsLoading])
 
   // 当对话更新时自动保存
   useEffect(() => {
@@ -237,6 +262,44 @@ export function MomoTalkPage() {
       console.error('[MomoTalk] 发送消息异常:', error)
     }
   }, [])
+
+  // 加载状态
+  if (studentsLoading) {
+    return (
+      <div className="flex h-full items-center justify-center animate-fade-in">
+        <div className="text-center">
+          <div className="text-4xl mb-4 animate-bounce">💬</div>
+          <p className="text-gray-500">正在连接 Anima...</p>
+        </div>
+      </div>
+    )
+  }
+
+  // 错误状态
+  if (studentsError) {
+    return (
+      <div className="flex h-full items-center justify-center animate-fade-in">
+        <div className="text-center">
+          <div className="text-4xl mb-4">⚠️</div>
+          <p className="text-gray-500 mb-2">无法连接 Anima</p>
+          <p className="text-sm text-gray-400">{studentsError.message}</p>
+        </div>
+      </div>
+    )
+  }
+
+  // 空状态（无已注册学生）
+  if (conversations.length === 0) {
+    return (
+      <div className="flex h-full items-center justify-center animate-fade-in">
+        <div className="text-center">
+          <div className="text-4xl mb-4">📭</div>
+          <p className="text-gray-500 mb-2">暂无可对话的学生</p>
+          <p className="text-sm text-gray-400">在 Anima 中注册学生后即可开始对话</p>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="flex h-full gap-4 animate-fade-in">
