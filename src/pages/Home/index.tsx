@@ -52,18 +52,20 @@ export function HomePage() {
         <div className="card p-6">
           <h2 className="text-lg font-semibold text-gray-800 mb-4">玩家状态</h2>
           <div className="grid grid-cols-3 gap-4">
-            <StatusItem label="生命值" value={`${player.health}/${player.maxHealth}`} icon="❤️" />
-            <StatusItem label="饱食度" value={`${player.hunger}/20`} icon="🍖" />
-            <StatusItem label="等级" value={`Lv.${player.level}`} icon="⭐" />
+            <StatusItem label="生命值" value={`${player.health ?? 0}/${player.maxHealth ?? 20}`} icon="❤️" />
+            <StatusItem label="饱食度" value={`${player.hunger ?? 0}/20`} icon="🍖" />
+            <StatusItem label="等级" value={`Lv.${player.level ?? 0}`} icon="⭐" />
           </div>
-          <div className="mt-4 pt-4 border-t border-gray-100">
-            <p className="text-sm text-gray-500">
-              📍 位置: {Math.floor(player.position.x)}, {Math.floor(player.position.y)}, {Math.floor(player.position.z)}
-            </p>
-            <p className="text-sm text-gray-500">
-              🌍 维度: {player.dimension.replace('minecraft:', '')}
-            </p>
-          </div>
+          {player.position && (
+            <div className="mt-4 pt-4 border-t border-gray-100">
+              <p className="text-sm text-gray-500">
+                📍 位置: {Math.floor(player.position.x)}, {Math.floor(player.position.y)}, {Math.floor(player.position.z)}
+              </p>
+              <p className="text-sm text-gray-500">
+                🌍 维度: {(player.dimension ?? 'overworld').replace('minecraft:', '')}
+              </p>
+            </div>
+          )}
         </div>
       )}
     </div>

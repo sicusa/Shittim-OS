@@ -38,3 +38,16 @@ Thumbs.db
 
 # Test coverage
 coverage/
+
+# ==================== TypeScript 声明文件 ====================
+# 自动生成的类型声明文件
+*.d.ts
+# 但保留 vite 环境声明
+!src/vite-env.d.ts
+
+# ==================== 备份/临时文件 ====================
+*.old.tsx
+*.old.ts
+*.bak
+*.tmp
+*~

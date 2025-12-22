@@ -121,6 +121,62 @@ export interface TaskCompleteEvent {
   task: Task
 }
 
+// ==================== Anima 相关类型 ====================
+
+/**
+ * Anima 学生信息（从后端获取）
+ */
+export interface AnimaStudent {
+  id: string
+  name: string
+  nameEn?: string
+  school?: string
+  club?: string
+  role?: string
+  hasActiveSession: boolean
+  historySize?: number
+}
+
+/**
+ * Anima 聊天请求响应
+ */
+export interface AnimaChatResponse {
+  success: boolean
+  requestId?: string
+  error?: string
+}
+
+/**
+ * Anima 学生回复事件
+ */
+export interface AnimaStudentReplyEvent {
+  requestId: string
+  studentId: string
+  success: boolean
+  content?: string
+  error?: string
+  promptTokens?: number
+  completionTokens?: number
+}
+
+/**
+ * Anima 获取学生列表响应
+ */
+export interface AnimaGetStudentsResponse {
+  success: boolean
+  students: AnimaStudent[]
+  error?: string
+}
+
+/**
+ * Anima 获取单个学生响应
+ */
+export interface AnimaGetStudentResponse {
+  success: boolean
+  student?: AnimaStudent
+  error?: string
+}
+
 // ==================== Bridge API 类型 ====================
 
 export type BridgeEventMap = {
@@ -135,6 +191,8 @@ export type BridgeEventMap = {
   'world:unload': { dimension: string }
   'student:message': StudentMessageEvent
   'task:complete': TaskCompleteEvent
+  // Anima 事件
+  'studentReply': AnimaStudentReplyEvent
 }
 
 export type BridgeEventName = keyof BridgeEventMap
