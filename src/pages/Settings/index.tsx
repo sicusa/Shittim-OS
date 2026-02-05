@@ -2,27 +2,27 @@ import { useState, useEffect } from 'react'
 
 // 缩放值存储到 localStorage
 const ZOOM_KEY = 'shittim-browser-zoom'
-const getInitialZoom = () => {
+const applyZoom = (zoom: number) => {
+  const scale = zoom / 100
+  document.documentElement.style.setProperty('--browser-zoom', String(scale))
+  document.body.style.transform = `scale(${scale})`
+  document.body.style.transformOrigin = 'top left'
+  document.body.style.width = `${100 / scale}%`
+  document.body.style.height = `${100 / scale}%`
+  localStorage.setItem(ZOOM_KEY, String(zoom))
+};
+const getAndApplyInitialZoom = () => {
   const stored = localStorage.getItem(ZOOM_KEY)
-  return stored ? Number(stored) : 100
+  const zoom = stored ? Number(stored) : 100
+  applyZoom(zoom)
+  return zoom
 }
 
 export function SettingsPage() {
   const [volume, setVolume] = useState(80)
   const [notifications, setNotifications] = useState(true)
   const [debugMode, setDebugMode] = useState(false)
-  const [browserZoom, setBrowserZoom] = useState(getInitialZoom)
-
-  // 应用缩放
-  useEffect(() => {
-    const scale = browserZoom / 100
-    document.documentElement.style.setProperty('--browser-zoom', String(scale))
-    document.body.style.transform = `scale(${scale})`
-    document.body.style.transformOrigin = 'top left'
-    document.body.style.width = `${100 / scale}%`
-    document.body.style.height = `${100 / scale}%`
-    localStorage.setItem(ZOOM_KEY, String(browserZoom))
-  }, [browserZoom])
+  const [browserZoom, setBrowserZoom] = useState(getAndApplyInitialZoom)
 
   return (
     <div className="space-y-6 animate-fade-in max-w-2xl">
@@ -41,9 +41,10 @@ export function SettingsPage() {
             <input
               type="range"
               min="50"
-              max="150"
+              max="250"
               step="5"
               value={browserZoom}
+              onPointerUp={() => applyZoom(browserZoom)}
               onChange={(e) => setBrowserZoom(Number(e.target.value))}
               className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-primary"
             />
@@ -51,6 +52,8 @@ export function SettingsPage() {
               <span>50%</span>
               <span>100%</span>
               <span>150%</span>
+              <span>200%</span>
+              <span>250%</span>
             </div>
           </div>
         </div>
