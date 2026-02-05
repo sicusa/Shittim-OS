@@ -1,28 +1,13 @@
-import { useState, useEffect } from 'react'
-
-// 缩放值存储到 localStorage
-const ZOOM_KEY = 'shittim-browser-zoom'
-const applyZoom = (zoom: number) => {
-  const scale = zoom / 100
-  document.documentElement.style.setProperty('--browser-zoom', String(scale))
-  document.body.style.transform = `scale(${scale})`
-  document.body.style.transformOrigin = 'top left'
-  document.body.style.width = `${100 / scale}%`
-  document.body.style.height = `${100 / scale}%`
-  localStorage.setItem(ZOOM_KEY, String(zoom))
-};
-const getAndApplyInitialZoom = () => {
-  const stored = localStorage.getItem(ZOOM_KEY)
-  const zoom = stored ? Number(stored) : 100
-  applyZoom(zoom)
-  return zoom
-}
+import { settingsStore, useSettingsStore } from '@/stores/settingsStore'
+import { useState } from 'react'
 
 export function SettingsPage() {
-  const [volume, setVolume] = useState(80)
-  const [notifications, setNotifications] = useState(true)
-  const [debugMode, setDebugMode] = useState(false)
-  const [browserZoom, setBrowserZoom] = useState(getAndApplyInitialZoom)
+  const settings = settingsStore.getState()
+  const volume = useSettingsStore(s => s.volume)
+  const notifications = useSettingsStore(s => s.notifications)
+  const debugMode = useSettingsStore(s => s.debugMode)
+
+  const [browserZoom, setBrowserZoom] = useState(settings.zoom)
 
   return (
     <div className="space-y-6 animate-fade-in max-w-2xl">
@@ -44,7 +29,7 @@ export function SettingsPage() {
               max="250"
               step="5"
               value={browserZoom}
-              onPointerUp={() => applyZoom(browserZoom)}
+              onPointerUp={() => settings.setZoom(browserZoom)}
               onChange={(e) => setBrowserZoom(Number(e.target.value))}
               className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-primary"
             />
@@ -74,7 +59,7 @@ export function SettingsPage() {
               min="0"
               max="100"
               value={volume}
-              onChange={(e) => setVolume(Number(e.target.value))}
+              onChange={(e) => settings.setVolume(Number(e.target.value))}
               className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-primary"
             />
           </div>
@@ -90,7 +75,7 @@ export function SettingsPage() {
             label="消息通知"
             description="收到新消息时显示通知"
             checked={notifications}
-            onChange={setNotifications}
+            onChange={settings.setNotifications}
           />
         </div>
       </section>
@@ -104,7 +89,7 @@ export function SettingsPage() {
             label="调试模式"
             description="在控制台显示 Bridge 调用日志"
             checked={debugMode}
-            onChange={setDebugMode}
+            onChange={settings.setDebugMode}
           />
         </div>
       </section>
