@@ -43,11 +43,11 @@ body {
 #root {
   width: 100%;
   height: 100%;
-  /* 圆角边框容器 */
-  border-radius: 16px;
+}
+
+#main-container {
   overflow: hidden;
-  /* background: linear-gradient(135deg, #FFF8FA 0%, #FFE8EF 100%); */
-  /* 轻微阴影增加层次感 */
+  border-radius: 16px;
   box-shadow: 0 4px 24px rgba(0, 0, 0, 0.15);
 }
 
@@ -56,10 +56,6 @@ body {
   position: absolute;
   width: calc(100% - 24px);
   height: calc(100% - 24px);
-}
-
-#root .use-gpu canvas {
-  border-radius: 16px;
 }
 
 /* 滚动条样式 */

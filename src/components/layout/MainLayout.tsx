@@ -1,6 +1,10 @@
 import { ReactNode } from 'react'
 import { NavLink } from 'react-router-dom'
 import { clsx } from 'clsx'
+import { LiveCanvas } from '@use-gpu/react'
+
+import { LiveBackground } from '../live/LiveBackground'
+import { useSettingsStore } from '@/stores/settingsStore'
 
 interface MainLayoutProps {
   children: ReactNode
@@ -47,47 +51,56 @@ const navItems: { path: string; label: string; iconKey: IconKey }[] = [
 ]
 
 export function MainLayout({ children }: MainLayoutProps) {
+  const zoom = useSettingsStore(s => s.zoom) / 100;
   return (
-    <div className="flex h-full w-full overflow-hidden">
-      {/* 侧边导航栏 - 粉色主题 */}
-      <nav className="w-20 bg-gradient-to-b from-white to-pink-50/50 backdrop-blur-sm border-r border-pink-100/60 flex flex-col py-4">
-        <div className="flex-1 flex flex-col gap-1.5 px-2">
-          {navItems.map((item) => (
-            <NavLink
-              key={item.path}
-              to={item.path}
-              className={({ isActive }) =>
-                clsx(
-                  'flex flex-col items-center justify-center py-3 rounded-xl transition-all duration-200',
-                  isActive
-                    ? 'bg-gradient-to-br from-primary to-primary-dark text-white shadow-lg shadow-primary/25'
-                    : 'text-gray-500 hover:bg-pink-100/50 hover:text-primary'
-                )
-              }
-            >
-              {icons[item.iconKey]}
-              <span className="text-[11px] mt-1.5 font-medium">{item.label}</span>
-            </NavLink>
-          ))}
-        </div>
+    <>
+      <div className="use-gpu">
+        <LiveCanvas style={{"borderRadius": 16 * zoom}}>
+          {(canvas) => <LiveBackground canvas={canvas} zoom={zoom}/>}
+        </LiveCanvas>
+      </div>
 
-        {/* Logo - 什亭之箱 */}
-        <div className="px-2 pt-4 border-t border-pink-100/60">
-          <div className="flex flex-col items-center text-primary/60">
-            <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5h3m-6.75 2.25h10.5a2.25 2.25 0 002.25-2.25v-15a2.25 2.25 0 00-2.25-2.25H6.75A2.25 2.25 0 004.5 4.5v15a2.25 2.25 0 002.25 2.25z" />
-            </svg>
-            <span className="text-[10px] mt-1 font-medium">Shittim</span>
+      <div id="main-container" className="flex h-full w-full overflow-hidden" style={{"zoom": zoom}}>
+        {/* 侧边导航栏 - 粉色主题 */}
+        <nav className="w-20 bg-linear-to-b from-white to-pink-50/50 backdrop-blur-sm border-r border-pink-100/60 flex flex-col py-4">
+          <div className="flex-1 flex flex-col gap-1.5 px-2">
+            {navItems.map((item) => (
+              <NavLink
+                key={item.path}
+                to={item.path}
+                className={({ isActive }) =>
+                  clsx(
+                    'flex flex-col items-center justify-center py-3 rounded-xl transition-all duration-200',
+                    isActive
+                      ? 'bg-linear-to-br from-primary to-primary-dark text-white shadow-lg shadow-primary/25'
+                      : 'text-gray-500 hover:bg-pink-100/50 hover:text-primary'
+                  )
+                }
+              >
+                {icons[item.iconKey]}
+                <span className="text-[11px] mt-1.5 font-medium">{item.label}</span>
+              </NavLink>
+            ))}
           </div>
-        </div>
-      </nav>
 
-      {/* 主内容区 */}
-      <main className="flex-1 overflow-hidden">
-        <div className="h-full overflow-auto p-6">
-          {children}
-        </div>
-      </main>
-    </div>
+          {/* Logo - 什亭之箱 */}
+          <div className="px-2 pt-4 border-t border-pink-100/60">
+            <div className="flex flex-col items-center text-primary/60">
+              <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5h3m-6.75 2.25h10.5a2.25 2.25 0 002.25-2.25v-15a2.25 2.25 0 00-2.25-2.25H6.75A2.25 2.25 0 004.5 4.5v15a2.25 2.25 0 002.25 2.25z" />
+              </svg>
+              <span className="text-[10px] mt-1 font-medium">Shittim</span>
+            </div>
+          </div>
+        </nav>
+
+        {/* 主内容区 */}
+        <main className="flex-1 overflow-hidden">
+          <div className="h-full overflow-auto p-6">
+            {children}
+          </div>
+        </main>
+      </div>
+    </>
   )
 }

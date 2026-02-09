@@ -25,11 +25,6 @@ export const settingsStore = createStore(
 
 export const useSettingsStore = wrapUseStore(settingsStore)
 
-settingsStore.subscribe(s => s.zoom, zoom => {
-  const scale = zoom / 100
-  document.documentElement.style.setProperty('zoom', String(scale))
-}, { fireImmediately: true })
-
 settingsStore.subscribe(s => s.debugMode, debug => {
   window.MiracleBridge?.configure({ debug })
 }, { fireImmediately: true })
